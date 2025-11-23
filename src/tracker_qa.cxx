@@ -4,7 +4,9 @@
 #include <iostream>
 #include <memory>
 
+#include "qa/CsvWriter.h"
 #include "rogue/GeneralError.h"
+#include "rogue/Helpers.h"
 #include "rogue/utilities/fileio/StreamReader.h"
 
 void display_usage();
@@ -28,10 +30,19 @@ int main(int argc, char** argv) {
     // Rogue
     auto reader = std::make_unique<rogue::utilities::fileio::StreamReader>();
 
-    // Open the file for reading
-    reader->open(file_name);
+    // Instantiate the CSV writer used to process the frames
+    // Note: These should be dymaically loaded.
+    auto parser = std::make_shared<tracker::CsvWriter>();
 
+    // Connect the two streams
+    rogueStreamConnect(reader, parser);
+
+    // Open the CSV file to write the data to
+    parser->open("test.csv");
+
+    // Open the file for reading
     std::cout << "Processing the file " << file_name << std::endl;
+    reader->open(file_name);
 
   } catch (const rogue::GeneralError& ex) {
     std::cerr << ex.what() << std::endl;
