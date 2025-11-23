@@ -35,14 +35,23 @@ if (NOT TARGET Rogue::Rogue)
         INTERFACE_LINK_LIBRARIES "${ROGUE_LIBRARIES}")
 endif()
 
+# Build the QA library
+add_library(qa ${PROJECT_SOURCE_DIR}/src/qa/CsvWriter.cxx)
+
+# Headers needed by the QA library
+target_include_directories(qa PRIVATE ${PROJECT_SOURCE_DIR}/include/)
+
+# Link the Rogue library to the QA library
+target_link_libraries(qa PRIVATE Rogue::Rogue)
+
 # Create the executable 
 add_executable(tracker-qa src/tracker_qa.cxx)
 
-# Include directories needed by tracker-qa
+# Headers needed by tracker-qa
 target_include_directories(tracker-qa PRIVATE ${PROJECT_SOURCE_DIR}/include)
 
 # Link the Rogue library to the tracker-qa target
-target_link_libraries(tracker-qa PRIVATE Rogue::Rogue)
+target_link_libraries(tracker-qa PRIVATE Rogue::Rogue qa)
 
 # Enforce cxx17
 target_compile_features(tracker-qa PUBLIC cxx_std_17)
