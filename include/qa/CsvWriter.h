@@ -4,7 +4,12 @@
 #include <memory>
 #include <string>
 
+#include "qa/FrameParser.h"
 #include "rogue/interfaces/stream/Slave.h"
+
+namespace rogue::interfaces::stream {
+class Frame;
+}  // namespace rogue::interfaces::stream
 
 namespace tracker {
 
@@ -76,6 +81,12 @@ class CsvWriter : public rogue::interfaces::stream::Slave {
   void acceptFrame(std::shared_ptr<rogue::interfaces::stream::Frame> frame);
 
  private:
+  // Parser used to extract the raw data
+  std::unique_ptr<FrameParser> parser;
+
+  // Output file stream used to write to a CSV file
   std::ofstream csv;
+
+  int event_count{0};
 };
 }  // namespace tracker
