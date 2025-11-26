@@ -36,7 +36,9 @@ if (NOT TARGET Rogue::Rogue)
 endif()
 
 # Build the QA library
-add_library(qa ${PROJECT_SOURCE_DIR}/src/qa/CsvWriter.cxx)
+add_library(qa ${PROJECT_SOURCE_DIR}/src/qa/CsvWriter.cxx
+               ${PROJECT_SOURCE_DIR}/src/qa/FrameParser.cxx
+)
 
 # Headers needed by the QA library
 target_include_directories(qa PRIVATE ${PROJECT_SOURCE_DIR}/include/)
