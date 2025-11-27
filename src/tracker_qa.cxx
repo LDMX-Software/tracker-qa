@@ -44,6 +44,8 @@ int main(int argc, char** argv) {
     std::cout << "Processing the file " << file_name << std::endl;
     reader->open(file_name);
 
+    reader->closeWait();
+
   } catch (const rogue::GeneralError& ex) {
     std::cerr << ex.what() << std::endl;
     return EXIT_FAILURE;
