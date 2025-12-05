@@ -57,7 +57,7 @@ void CsvWriter::acceptFrame(
         << int(sample.hybrid_id) << "," << int(sample.apv_id) << ","
         << int(sample.channel) << "," << pchannel << ","
         << int(sample.samples[0]) << "," << int(sample.samples[1]) << ","
-        << int(sample.samples[2]) << int(sample.read_error) << ","
+        << int(sample.samples[2]) << "," << int(sample.read_error) << ","
         << int(sample.head) << "," << int(sample.tail) << ","
         << int(sample.filter) << std::endl;
   }
