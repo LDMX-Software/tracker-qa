@@ -20,8 +20,6 @@ void CsvWriter::open(const std::string& file_path) {
   if (!csv.is_open()) {
     throw std::runtime_error("Failed to open file: " + file_path);
   }
-  csv << "ROR_trigger,FEB,Hybrid,APV,channel,pchannel,sample0,sample1,sample2,"
-         "error,head,tail,filter";
 
   parser = std::make_unique<FrameParser>();
 }
@@ -29,6 +27,24 @@ void CsvWriter::open(const std::string& file_path) {
 // Close the file
 void CsvWriter::close() {
   if (csv.is_open()) {
+    // Due to varying readout modes (e.g. 3-sample, 27-sample), the CSV header
+    // cannot be written when the file is first opened. The readout mode is
+    // determined during processing from the data.  Once the readout mode is
+    // identified, the appropriate CSV header wil be generated and written
+    // when the file is closed.
+
+    // Move the writer pointer to the begining of the file
+    csv.seekp(0, std::ios::beg);
+
+    // Write the header
+    csv << "ROR_trigger,FEB,Hybrid,APV,channel,pchannel,sample0,sample1,"
+           "sample2,"
+           "error,head,tail,filter\n";
+
+    // Ensure everything is written to the file
+    csv.flush();
+
+    // Close the file
     csv.close();
   }
 }
