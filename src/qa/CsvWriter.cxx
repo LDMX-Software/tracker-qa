@@ -1,7 +1,5 @@
 #include "qa/CsvWriter.h"
 
-#include <stdint.h>
-
 #include <iostream>
 #include <stdexcept>
 
@@ -10,11 +8,7 @@
 namespace tracker {
 
 // Destructor
-CsvWriter::~CsvWriter() {
-  if (csv.is_open()) {
-    close();
-  }
-}
+CsvWriter::~CsvWriter() { close(); }
 
 // Open the file
 void CsvWriter::open(const std::string& file_path) {
