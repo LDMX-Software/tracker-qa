@@ -22,6 +22,10 @@ void CsvWriter::open(const std::string& file_path) {
     throw std::runtime_error("Failed to open file: " + file_path);
   }
 
+  // Write the header out
+  csv << "APV trigger, FEB, Hybrid, APV, channel, pchannel, sample0, sample1, "
+         "sample2, error, head, tail, filter\n";
+
   parser = std::make_unique<FrameParser>();
 }
 
@@ -37,25 +41,11 @@ void CsvWriter::acceptFrame(
   // Skip the frame if an error is found.
   if (frame->getError()) return;
 
+  if (frame->getChannel() != 0) return;
+
   // Extract the samples from the frame.
   std::vector<Sample> samples = parser->parse(frame);
   if (samples.empty()) return;
-
-  // Due to varying readout modes (e.g. 3-sample, 27-sample), the CSV header
-  // cannot be written when the file is first opened. The readout mode can be
-  // determined by checking the size of the samples vector after processing of
-  // the first frame. Once the readout mode is identified, the appropriate CSV
-  // header wil be generated and written once.
-
-  // This checks if the file is empty
-  if (csv.tellp() == 0) {
-    csv << "ROR_trigger, FEB, Hybrid, APV, channel, pchannel, ";
-    for (int sample_count{0}; sample_count < samples[0].samples.size();
-         ++sample_count) {
-      csv << ("sample" + std::to_string(sample_count) + ", ");
-    }
-    csv << "error, head, tail, filter\n";
-  }
 
   // Buffer to hold CSV rows before writing
   std::stringstream buffer;
@@ -67,7 +57,7 @@ void CsvWriter::acceptFrame(
   for (const auto& sample : samples) {
     int pchannel{(5 * 128 - 1) -
                  (int(sample.apv_id) * 128 + (128 - 1) - int(sample.channel))};
-    buffer << int(sample.ror_trigger) << ", " << int(sample.feb_id) << ", "
+    buffer << int(sample.apv_trigger) << ", " << int(sample.feb_id) << ", "
            << int(sample.hybrid_id) << ", " << int(sample.apv_id) << ", "
            << int(sample.channel) << ", " << pchannel << ", ";
     for (int sample_count{0}; sample_count < samples[0].samples.size();
