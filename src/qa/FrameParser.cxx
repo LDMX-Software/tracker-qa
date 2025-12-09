@@ -13,17 +13,9 @@ std::vector<Sample> FrameParser::parse(
   // Container for all samples
   std::vector<Sample> samples;
 
-  // Check the last byte of the frame to determine if it contains a config
-  // dump or tracker samples. A frame containing a config dump will have
-  // the last byte set to 0x0A.
-  auto it{frame->end() - 1};
-  if (((int)*it) == 0x0A) {
-    return samples;
-  }
-
   //  Get an iterator to the data in the frame. The iterator is advanced by
   //  a bytes where the event header begins.
-  it = frame->begin() + 1;
+  auto it{frame->begin() + 1};
 
   //
   // Extract the event header
@@ -31,6 +23,10 @@ std::vector<Sample> FrameParser::parse(
 
   EventHeader event_header;
   rogue::interfaces::stream::fromFrame(it, 1, &event_header.subsystem_id);
+  // If the Subsystem ID isn't equal to 4, then the frame contains non-tracker
+  // data.
+  if (event_header.subsystem_id != 4) return samples;
+
   rogue::interfaces::stream::fromFrame(it, 1, &event_header.contributor_id);
   rogue::interfaces::stream::fromFrame(it, 1, &event_header.burn_count);
   it = it + 4;
@@ -72,10 +68,6 @@ std::vector<Sample> FrameParser::parse(
     sample.feb_id = sample.feb_id & 0x0F;
     --it;
     rogue::interfaces::stream::fromFrame(it, 2, &sample.ror_trigger);
-    // std::cout << "Hex value: 0x" << std::hex << std::uppercase <<
-    // std::setw(2)
-    //           << std::setfill('0') << unsigned(sample.ror_trigger) <<
-    //           std::endl;
     sample.ror_trigger = (sample.ror_trigger >> 4) & 0x3F;
     --it;
     uint8_t tail;
