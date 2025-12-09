@@ -27,7 +27,7 @@ struct Sample {
   uint8_t tail;
   uint8_t head;
   uint8_t filter;
-  uint16_t ror_trigger;
+  uint16_t apv_trigger;
   std::vector<uint16_t> samples{0, 0, 0};
 };
 

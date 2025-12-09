@@ -67,8 +67,8 @@ std::vector<Sample> FrameParser::parse(
     rogue::interfaces::stream::fromFrame(it, 1, &sample.feb_id);
     sample.feb_id = sample.feb_id & 0x0F;
     --it;
-    rogue::interfaces::stream::fromFrame(it, 2, &sample.ror_trigger);
-    sample.ror_trigger = (sample.ror_trigger >> 4) & 0x3F;
+    rogue::interfaces::stream::fromFrame(it, 2, &sample.apv_trigger);
+    sample.apv_trigger = (sample.apv_trigger >> 4) & 0x3F;
     --it;
     uint8_t tail;
     rogue::interfaces::stream::fromFrame(it, 1, &tail);
@@ -85,7 +85,7 @@ std::vector<Sample> FrameParser::parse(
     std::cout << "FEB: " << unsigned(sample.feb_id) << std::endl;
     std::cout << "Hybrid: " << unsigned(sample.hybrid_id) << std::endl;
     std::cout << "APV: " << unsigned(sample.apv_id) << std::endl;
-    std::cout << "Trigger: " << unsigned(sample.ror_trigger) << std::endl;
+    std::cout << "Trigger: " << unsigned(sample.apv_trigger) << std::endl;
     std::cout << "Read Error: " << unsigned(sample.read_error) << std::endl;
     std::cout << "Tail: " << unsigned(sample.tail) << std::endl;
     std::cout << "Head: " << unsigned(sample.head) << std::endl;
