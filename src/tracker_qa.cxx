@@ -1,5 +1,4 @@
 #include <cstdlib>
-#include <exception>
 #include <filesystem>
 #include <iostream>
 #include <memory>
@@ -10,27 +9,41 @@
 #include "rogue/Helpers.h"
 #include "rogue/utilities/fileio/StreamReader.h"
 
-void display_usage();
-
 // Constants
 constexpr const char* APPLICATION_NAME = "tracker-qa";
 
+void display_usage() {
+  std::cout << "Usage: " << APPLICATION_NAME
+            << " <input_file> [-o <output_file>]\n";
+}
+
 int main(int argc, char** argv) {
   // Check if the correct number of arguments were passed
-  if (argc != 2) {
+  if (argc < 2 || argc > 4) {
     display_usage();
     return EXIT_FAILURE;
   }
 
-  // Get the file anme from the command line argument
+  // Get the input file name from the command line argument
   const char* file_name = argv[1];
 
-  // Get the file name without extension and create the output file path
-  std::filesystem::path input_file_path(file_name);
-  std::filesystem::path output_file_path{
-      input_file_path.replace_extension(".csv")};
+  std::filesystem::path output_file_path;
 
-  // Open the file for reading
+  // Parse the command-line arguments
+  if (argc == 2) {
+    // No -o flag, so we use the input file name and change the extension to
+    // .csv
+    std::filesystem::path input_file_path(file_name);
+    output_file_path = input_file_path.replace_extension(".csv");
+  } else if (argc == 4 && std::strcmp(argv[2], "-o") == 0) {
+    // If -o flag is provided, set the output file to the provided argument
+    output_file_path = std::filesystem::path(argv[3]);
+  } else {
+    // Incorrect usage of flags
+    display_usage();
+    return EXIT_FAILURE;
+  }
+
   try {
     // Instantiate the reader used to stream frames from a file created by
     // Rogue
@@ -59,8 +72,4 @@ int main(int argc, char** argv) {
   }
 
   return EXIT_SUCCESS;
-}
-
-void display_usage() {
-  std::cout << "Usage: " << APPLICATION_NAME << " {raw_data_file}\n";
 }
