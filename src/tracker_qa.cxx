@@ -7,6 +7,7 @@
 #include "qa/CsvWriter.h"
 #include "rogue/GeneralError.h"
 #include "rogue/Helpers.h"
+#include "rogue/numpy.h"
 #include "rogue/utilities/fileio/StreamReader.h"
 
 // Constants
