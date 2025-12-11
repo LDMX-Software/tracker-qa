@@ -56,18 +56,24 @@ void CsvWriter::acceptFrame(
 
   // To improve performance, pre-allocate space in the vector. This
   // assumes that each line will contain ~80 characters.
-  buffer.str().reserve(samples.size() * 80);
+  buffer.str().reserve(samples.size() * 100);
 
   for (const auto& sample : samples) {
-    int pchannel{(5 * 128 - 1) -
-                 (int(sample.apv_id) * 128 + (128 - 1) - int(sample.channel))};
-    buffer << event_count << ", " << int(sample.apv_trigger) << ", "
-           << int(sample.feb_id) << ", " << int(sample.hybrid_id) << ", "
-           << int(sample.apv_id) << ", " << int(sample.channel) << ", "
-           << pchannel << ", " << sample.samples[0] << ", " << sample.samples[1]
-           << ", " << sample.samples[2] << ", " << int(sample.read_error)
-           << ", " << int(sample.head) << ", " << int(sample.tail) << ", "
-           << int(sample.filter) << std::endl;
+    auto apv_id{static_cast<int>(sample.apv_id)};
+    auto channel{static_cast<int>(sample.channel)};
+    int pchannel{(5 * 128 - 1) - (apv_id * 128 + (128 - 1) - channel)};
+
+    buffer << event_count << ", " << static_cast<int>(sample.apv_trigger)
+           << ", " << static_cast<int>(sample.feb_id) << ", "
+           << static_cast<int>(sample.hybrid_id) << ", " << apv_id << ", "
+           << channel << ", " << pchannel << ", "
+           << static_cast<int>(sample.samples[0]) << ", "
+           << static_cast<int>(sample.samples[1]) << ", "
+           << static_cast<int>(sample.samples[2]) << ", "
+           << static_cast<int>(sample.read_error) << ", "
+           << static_cast<int>(sample.head) << ", "
+           << static_cast<int>(sample.tail) << ", "
+           << static_cast<int>(sample.filter) << std::endl;
   }
 
   // Write the entire buffer
