@@ -1,8 +1,9 @@
-
 #include <cstdlib>
 #include <exception>
+#include <filesystem>
 #include <iostream>
 #include <memory>
+#include <string>
 
 #include "qa/CsvWriter.h"
 #include "rogue/GeneralError.h"
@@ -24,6 +25,11 @@ int main(int argc, char** argv) {
   // Get the file anme from the command line argument
   const char* file_name = argv[1];
 
+  // Get the file name without extension and create the output file path
+  std::filesystem::path input_file_path(file_name);
+  std::filesystem::path output_file_path{
+      input_file_path.replace_extension(".csv")};
+
   // Open the file for reading
   try {
     // Instantiate the reader used to stream frames from a file created by
@@ -38,7 +44,8 @@ int main(int argc, char** argv) {
     rogueStreamConnect(reader, parser);
 
     // Open the CSV file to write the data to
-    parser->open("test.csv");
+    std::cout << "Writing output to " << output_file_path << std::endl;
+    parser->open(output_file_path.string());
 
     // Open the file for reading
     std::cout << "Processing the file " << file_name << std::endl;
