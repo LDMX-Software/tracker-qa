@@ -52,7 +52,8 @@ std::vector<Sample> FrameParser::parse(
   // Calculate the total number of multisamples and process them
   //
   size_t total_multisamples = std::distance(it, frame->end()) / 10;
-  // std::cout << "Total multisamples: " << total_multisamples << std::endl;
+  samples.reserve(total_multisamples * 12);
+  //  std::cout << "Total multisamples: " << total_multisamples << std::endl;
   Sample sample;
   for (int multisample{0}; multisample < total_multisamples - 1;
        ++multisample) {
@@ -65,7 +66,7 @@ std::vector<Sample> FrameParser::parse(
     sample.apv_id = apv_hybrid_id & 0x07;
     sample.hybrid_id = (apv_hybrid_id >> 4) & 0x07;
     rogue::interfaces::stream::fromFrame(it, 1, &sample.feb_id);
-    sample.feb_id = sample.feb_id & 0x0F;
+    sample.feb_id &= 0x0F;
     --it;
     rogue::interfaces::stream::fromFrame(it, 2, &sample.apv_trigger);
     sample.apv_trigger = (sample.apv_trigger >> 4) & 0x3F;
