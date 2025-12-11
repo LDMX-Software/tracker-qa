@@ -23,8 +23,8 @@ void CsvWriter::open(const std::string& file_path) {
   }
 
   // Write the header out
-  csv << "APV trigger, FEB, Hybrid, APV, channel, pchannel, sample0, sample1, "
-         "sample2, error, head, tail, filter\n";
+  csv << "Event, APV trigger, FEB, Hybrid, APV, channel, pchannel, sample0, "
+         "sample1, sample2, error, head, tail, filter\n";
 
   parser = std::make_unique<FrameParser>();
 }
@@ -34,6 +34,8 @@ void CsvWriter::close() {
   if (csv.is_open()) {
     csv.close();
   }
+
+  std::cout << "Total events processed " << event_count << std::endl;
 }
 
 void CsvWriter::acceptFrame(
@@ -47,6 +49,8 @@ void CsvWriter::acceptFrame(
   std::vector<Sample> samples = parser->parse(frame);
   if (samples.empty()) return;
 
+  event_count++;
+
   // Buffer to hold CSV rows before writing
   std::stringstream buffer;
 
@@ -57,15 +61,13 @@ void CsvWriter::acceptFrame(
   for (const auto& sample : samples) {
     int pchannel{(5 * 128 - 1) -
                  (int(sample.apv_id) * 128 + (128 - 1) - int(sample.channel))};
-    buffer << int(sample.apv_trigger) << ", " << int(sample.feb_id) << ", "
-           << int(sample.hybrid_id) << ", " << int(sample.apv_id) << ", "
-           << int(sample.channel) << ", " << pchannel << ", ";
-    for (int sample_count{0}; sample_count < samples[0].samples.size();
-         ++sample_count) {
-      buffer << int(sample.samples[sample_count]) << ", ";
-    }
-    buffer << int(sample.read_error) << ", " << int(sample.head) << ", "
-           << int(sample.tail) << ", " << int(sample.filter) << std::endl;
+    buffer << event_count << ", " << int(sample.apv_trigger) << ", "
+           << int(sample.feb_id) << ", " << int(sample.hybrid_id) << ", "
+           << int(sample.apv_id) << ", " << int(sample.channel) << ", "
+           << pchannel << ", " << sample.samples[0] << ", " << sample.samples[1]
+           << ", " << sample.samples[2] << ", " << int(sample.read_error)
+           << ", " << int(sample.head) << ", " << int(sample.tail) << ", "
+           << int(sample.filter) << std::endl;
   }
 
   // Write the entire buffer
